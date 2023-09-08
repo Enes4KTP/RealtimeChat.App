@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealtimeChat.API", "RealtimeChat\RealtimeChat.API.csproj", "{594F70AC-5D31-482E-9861-A996879D8E72}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "APIConsume", "APIConsume", "{4BDB8D53-5334-4BDD-B6AD-84D1A182A7AD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RtChat.EntityLayer", "RtChat.EntityLayer\RtChat.EntityLayer.csproj", "{36C02D19-B1AC-463A-AC68-73BC458D1681}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RtChat.DataAccessLayer", "RtChat.DataAccessLayer\RtChat.DataAccessLayer.csproj", "{2852DA50-2FFD-4DBE-B77C-3C0B974141B1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RtChat.BusinessLayer", "RtChat.BusinessLayer\RtChat.BusinessLayer.csproj", "{FEB60AA0-9A0C-4C50-8ED5-028E99BFBA52}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{28F8CBBA-0FF8-43C5-8FDA-B7488CFA9739}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealtimeChat.MVC", "RealtimeChat.MVC\RealtimeChat.MVC.csproj", "{879E7878-0AD0-4033-92C0-714332D85992}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{594F70AC-5D31-482E-9861-A996879D8E72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{594F70AC-5D31-482E-9861-A996879D8E72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{594F70AC-5D31-482E-9861-A996879D8E72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{594F70AC-5D31-482E-9861-A996879D8E72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36C02D19-B1AC-463A-AC68-73BC458D1681}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36C02D19-B1AC-463A-AC68-73BC458D1681}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36C02D19-B1AC-463A-AC68-73BC458D1681}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36C02D19-B1AC-463A-AC68-73BC458D1681}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2852DA50-2FFD-4DBE-B77C-3C0B974141B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2852DA50-2FFD-4DBE-B77C-3C0B974141B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2852DA50-2FFD-4DBE-B77C-3C0B974141B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2852DA50-2FFD-4DBE-B77C-3C0B974141B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEB60AA0-9A0C-4C50-8ED5-028E99BFBA52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEB60AA0-9A0C-4C50-8ED5-028E99BFBA52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEB60AA0-9A0C-4C50-8ED5-028E99BFBA52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEB60AA0-9A0C-4C50-8ED5-028E99BFBA52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{879E7878-0AD0-4033-92C0-714332D85992}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{879E7878-0AD0-4033-92C0-714332D85992}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{879E7878-0AD0-4033-92C0-714332D85992}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{879E7878-0AD0-4033-92C0-714332D85992}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{594F70AC-5D31-482E-9861-A996879D8E72} = {4BDB8D53-5334-4BDD-B6AD-84D1A182A7AD}
+		{36C02D19-B1AC-463A-AC68-73BC458D1681} = {4BDB8D53-5334-4BDD-B6AD-84D1A182A7AD}
+		{2852DA50-2FFD-4DBE-B77C-3C0B974141B1} = {4BDB8D53-5334-4BDD-B6AD-84D1A182A7AD}
+		{FEB60AA0-9A0C-4C50-8ED5-028E99BFBA52} = {4BDB8D53-5334-4BDD-B6AD-84D1A182A7AD}
+		{879E7878-0AD0-4033-92C0-714332D85992} = {28F8CBBA-0FF8-43C5-8FDA-B7488CFA9739}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {391E7A90-AAE0-4736-B390-9F5A21DC7F23}
+	EndGlobalSection
+EndGlobal
