@@ -33,4 +33,8 @@
     <ProjectReference Include="..\RtChat.EntityLayer\RtChat.EntityLayer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="images\" />
+  </ItemGroup>
+
 </Project>
