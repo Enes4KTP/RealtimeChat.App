@@ -4,398 +4,432 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>WhatsApp Web</title>
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.14/signalr.min.js"></script>
-	<link rel="stylesheet" href="/css/style.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Web</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.14/signalr.min.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/svg-with-js.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-	<div class="container">
-		<div class="leftside">
-			<div class="header">
-				<div class="userImg">
-					<img src="/img/user2.png" alt="" class="cover">
-				</div>
-				<ul class="nav_icons">
-					<li>
-						<i class="fa-regular fa-circle"></i>
-					</li>
-					<li>
-						<i class="fa-regular fa-message" id="messageButton"></i>
-					</li>
-					<li>
-						<i class="fa-solid fa-ellipsis-vertical" id="settingsIcon"></i>
-					</li>
-				</ul>
-			</div>
-			<div class="searchChat">
-				<div>
-					<input type="text" placeholder="Mesaj aratın veya yeni sohbet başlatın">
-					<i class="fa-solid fa-magnifying-glass"></i>
-				</div>
-			</div>
-			<div id="settingsWindow" class="settings-window">
-				<button class="settings-button">Ayarlar</button>
-				<button class="settings-button" id="pp">Profil Fotoğrafı</button>
+    <div class="container">
+        <div class="leftside">
+            <div class="header">
+                <div class="userImg">
+                    <img src="@Model.CurrentUser.PhotoUrl" alt="" class="cover">
+                </div>
+                <ul class="nav_icons">
+                    <li>
+                        <i class="fa-regular fa-circle"></i>
+                    </li>
+                    <li>
+                        <i class="fa-regular fa-message" id="messageButton"></i>
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-ellipsis-vertical" id="settingsIcon"></i>
+                    </li>
+                </ul>
+            </div>
+            <div class="searchChat">
+                <div>
+                    <input type="text" placeholder="Mesaj aratın veya yeni sohbet başlatın">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+            </div>
+            <div id="settingsWindow" class="settings-window">
+                <button class="settings-button" id="pp">Profil Fotoğrafı</button>
 
-				<div id="ppModal">
-					<div class="overlay"></div>
-					<div id="ppForm" class="form-group">
-						<label for="PhotoUrl">Fotoğraf Ekle</label>
-						<input type="file" name="PhotoUrl" id="PhotoUrl" class="form-control">
-						<button id="closeButton">Kapat</button>
-						<!-- Diğer içerikleri buraya ekleyebilirsiniz -->
-					</div>
-				</div>
-				<!-- Ayarlar içeriği buraya gelebilir -->
-				<!-- İsterseniz bu pencereye istediğiniz içeriği ekleyebilirsiniz -->
-			</div>
+                <div id="ppModal">
+                        <div class="profilepic__wrapper">
+                        <img class="profilepic__image" src="@Model.CurrentUser.PhotoUrl" width="150" height="150" alt="Profibild" />
+                            <label class="profilepic__content" for="PhotoUrl">
+                                <span class="profilepic__icon">
+                                    <i class="fas fa-camera"></i>
+                                </span>
+                                <span class="profilepic__text">	Fotoğraf Ekle</span>
 
-			<div id="userListModal" class="chatList" style="display: none;">
-				<div class="modal-content">
-					<div id="userList">
-						<!-- Bu kısım, veritabanından gelen kullanıcı bilgilerini listeleyecek -->
-						@foreach (var userName in Model.Users)
-						{
-							<div class="block unread" data-user="@userName.Id" onclick="selectUser('@userName')">
-								<div class="imgBox">
-									<img src="/img/user.png" alt="" style="max-width: 100px; max-height: 100px;">
-								</div>
-								<div class="details">
-									<div class="listHead">
-										<h4>@userName</h4>
-									</div>
-								</div>
-							</div>
-						}
-					</div>
-				</div>
-			</div>
+                                <input type="file" name="file" id="PhotoUrl" style="display: none;">
+                            </label>
+                        </div>
+                    <div id="resultMessage"></div>
+                </div>
 
-			<div class="chatList" id="chatList">
-				@foreach (var userId in Model.DisplayedUsers)
-				{
-					var user = Model.Users.FirstOrDefault(u => u.Id.ToString() == userId);
-					var lastMessageFromUser = Model.ReceivedMessages
-					.Where(message =>
-					(message.From == userId && message.To == Model.CurrentUser.Id.ToString()) ||
-					(message.To == userId && message.From == Model.CurrentUser.Id.ToString()))
-					.OrderByDescending(message => message.Time)
-					.FirstOrDefault();
+            </div>
 
-					<div class="block unread" data-user="@userId" data-username="@user.UserName" onclick="selectUser('@userId')">
-						<div class="imgBox">
-							<img src="/img/user.png" alt="">
-						</div>
-						<div class="details">
-							<div class="listHead">
-								<h4>@user.UserName</h4>
-								@if (lastMessageFromUser != null)
-								{
-									<p class="time">@lastMessageFromUser.Time.ToString("HH.mm")</p>
-									<div class="message_p">
-										<p>@lastMessageFromUser.Message</p>
-									</div>
-								}
-								else
-								{
-									<div class="message_p">
-										<p>No messages</p>
-									</div>
-								}
-							</div>
-						</div>
-					</div>
-				}
-			</div>
-		</div>
+            <div id="userListModal" class="chatList" style="display: none;">
+                <div class="modal-content">
+                    <div id="userList">
+                        <!-- Bu kısım, veritabanından gelen kullanıcı bilgilerini listeleyecek -->
+                        @foreach (var userName in Model.Users)
+                        {
+                            <div class="block unread" data-user="@userName.Id" data-user-photo-url="@userName.PhotoUrl" onclick="selectUser('@userName')">
+                                <div class="imgBox">
+                                    <img src="@userName.PhotoUrl" alt="" style="max-width: 100px; max-height: 100px;">
+                                </div>
+                                <div class="details">
+                                    <div class="listHead">
+                                        <h4>@userName</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
 
-		<div class="rightside">
-			<div class="header">
-				<div class="imgText">
-					<div class="userImg">
-						<img src="/img/user.png" id="senderPhoto" alt="" class="cover">
-					</div>
-					<h4 id="senderName" data-user=""></h4>
-				</div>
-				<ul class="nav_icons">
-					<li><i class="fa-solid fa-ellipsis-vertical"></i></li>
-				</ul>
-			</div>
+            <div class="chatList" id="chatList">
+                @foreach (var userId in Model.DisplayedUsers)
+                {
+                    var user = Model.Users.FirstOrDefault(u => u.Id.ToString() == userId);
+                    var lastMessageFromUser = Model.ReceivedMessages
+                    .Where(message =>
+                    (message.From == userId && message.To == Model.CurrentUser.Id.ToString()) ||
+                    (message.To == userId && message.From == Model.CurrentUser.Id.ToString()))
+                    .OrderByDescending(message => message.Time)
+                    .FirstOrDefault();
 
-			<div class="chatBox" id="chatBox">
-				@if (!string.IsNullOrEmpty(Model.SelectedUser) && Model.GroupedMessages.ContainsKey(Model.SelectedUser))
-				{
-					var messages = Model.GroupedMessages[Model.SelectedUser];
-					foreach (var message in messages)
-					{
-						var messageClass = message.From == Model.CurrentUser.Id.ToString() ? "my_message" : "frnd_message";
-						var messageDate = message.Time.ToLocalTime();
-						var formattedTime = messageDate.ToString("HH:mm");
+                    <div class="block unread" data-user="@userId" data-username="@user.UserName" onclick="selectUser('@userId')">
+                        <div class="imgBox">
+                            <img src="@user.PhotoUrl" alt="">
+                        </div>
+                        <div class="details">
+                            <div class="listHead">
+                                <h4>@user.UserName</h4>
+                                @if (lastMessageFromUser != null)
+                                {
+                                    <p class="time">@lastMessageFromUser.Time.ToString("HH.mm")</p>
+                                    <div class="message_p">
+                                        <p>@lastMessageFromUser.Message</p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="message_p">
+                                        <p>No messages</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
 
-						<div class="message @messageClass">
-							<p>@message.Message <br> <span>@formattedTime</span></p>
-							@if (message.From == Model.CurrentUser.Id.ToString())
-							{
-								<span class="mine-indicator">Sent by me</span>
-							}
-						</div>
-					}
-				}
-			</div>
+        <div class="rightside">
+            <div class="header">
+                <div class="imgText">
+                    <div class="userImg">
+                        <img src="" id="senderPhoto" alt="" class="cover" data-user-photo-url="">
+                    </div>
+                    <h4 id="senderName" data-user=""></h4>
+                </div>
+                <ul class="nav_icons">
+                    <li><i class="fa-solid fa-ellipsis-vertical"></i></li>
+                </ul>
+            </div>
 
-			<form id="messageForm" method="post">
-				<div class="chatInput">
-					<div>
-						<input id="messageInput" type="text" name="messageText" placeholder="Mesajınızı buraya yazın">
-						<i class="fa-solid fa-magnifying-glass"></i>
-					</div>
-					<button type="submit" id="sendButton" class="fa-regular fa-paper-plane fa-lg"></button>
-				</div>
-			</form>
+            <div class="chatBox" id="chatBox">
+                @if (!string.IsNullOrEmpty(Model.SelectedUser) && Model.GroupedMessages.ContainsKey(Model.SelectedUser))
+                {
+                    var messages = Model.GroupedMessages[Model.SelectedUser];
+                    foreach (var message in messages)
+                    {
+                        var messageClass = message.From == Model.CurrentUser.Id.ToString() ? "my_message" : "frnd_message";
+                        var messageDate = message.Time.ToLocalTime();
+                        var formattedTime = messageDate.ToString("HH:mm");
 
-		</div>
-	</div>
+                        <div class="message @messageClass">
+                            <p>@message.Message <br> <span>@formattedTime</span></p>
+                            @if (message.From == Model.CurrentUser.Id.ToString())
+                            {
+                                <span class="mine-indicator">Sent by me</span>
+                            }
+                        </div>
+                    }
+                }
+            </div>
 
-	<script>
-		let isUserListModalOpen = false;
-		let isChatListOpen = true;
-		let isSendingMessage = false;
+            <form id="messageForm" method="post">
+                <div class="chatInput">
+                    <div>
+                        <input id="messageInput" type="text" name="messageText" placeholder="Mesajınızı buraya yazın">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                    <button type="submit" id="sendButton" class="fa-regular fa-paper-plane fa-lg"></button>
+                </div>
+            </form>
 
-		const messageBlocks = document.querySelectorAll('.chatList .block');
-		const senderNameElement = document.getElementById('senderName');
-		const chatInput = document.querySelector('.chatInput input');
-		const sendButton = document.getElementById('sendButton');
-		const connection = new signalR.HubConnectionBuilder()
-			.withUrl("/chathub")
-			.build();
+        </div>
+    </div>
 
-		connection.on("receiveMessage", (message) => {
-			const chatBox = document.querySelector('.chatBox');
+    <script>
+        let isUserListModalOpen = false;
+        let isChatListOpen = true;
+        let isSendingMessage = false;
 
-			const isMyMessage = message.from == '@(Model.CurrentUser.Id)';
+        const messageBlocks = document.querySelectorAll('.chatList .block');
+        const senderNameElement = document.getElementById('senderName');
 
-			if (!isMyMessage) {
-				const messageDate = new Date(message.time);
-				const formattedTime = messageDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+        const chatInput = document.querySelector('.chatInput input');
+        const sendButton = document.getElementById('sendButton');
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chathub")
+            .build();
 
-				const messageHTML = `
-													<div class="message frnd_message">
-														<p>${message.message} <br> <span>${formattedTime}</span></p>
-													</div>
-												`;
+        connection.on("receiveMessage", (message) => {
+            const chatBox = document.querySelector('.chatBox');
 
-				chatBox.innerHTML += messageHTML;
-				chatBox.scrollTop = chatBox.scrollHeight;
-			}
-		});
+            const isMyMessage = message.from == '@(Model.CurrentUser.Id)';
 
-		connection.start().catch((err) => {
-			console.error(err.toString());
-		});
+            if (!isMyMessage) {
+                const messageDate = new Date(message.time);
+                const formattedTime = messageDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
 
+                const messageHTML = `
+                                                                                    <div class="message frnd_message">
+                                                                                        <p>${message.message} <br> <span>${formattedTime}</span></p>
+                                                                                    </div>
+                                                                                `;
 
-		messageBlocks.forEach((block) => {
-			block.addEventListener('click', async () => {
-				const senderId = block.getAttribute('data-user');
-				selectUser(senderId);
+                chatBox.innerHTML += messageHTML;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        });
 
-				try {
-					const response = await fetch(`/Main/GetAllMessagesWithUser?userId=${senderId}`);
-					const data = await response.json();
-
-					if (data.success) {
-						const chatBox = document.querySelector('.chatBox');
-						chatBox.innerHTML = '';
-
-						data.messages.forEach((message) => {
-							const messageClass = message.from == '@(Model.CurrentUser.Id)' ? 'my_message' : 'frnd_message';
-							const messageDate = new Date(message.time);
-							const formattedTime = messageDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
-
-							const messageHTML = `
-																<div class="message ${messageClass}">
-																	<p>${message.message} <br> <span>${formattedTime}</span></p>
-																</div>
-															`;
-
-							chatBox.innerHTML += messageHTML;
-						});
-
-						chatBox.scrollTop = chatBox.scrollHeight;
-					} else {
-						console.error('Mesajları getirirken bir hata oluştu.');
-					}
-				} catch (error) {
-					console.error('Mesajları getirirken bir hata oluştu.', error);
-				}
-			});
-		});
-
-		sendButton.addEventListener('click', function (event) {
-			event.preventDefault();
-
-			if (isSendingMessage) {
-				return;
-			}
-			sendMessage();
-		});
-
-		async function sendMessage() {
-			const newMessage = chatInput.value.trim();
-
-			if (newMessage !== '') {
-				const chatBox = document.querySelector('.chatBox');
-				const currentTime = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
-
-				isSendingMessage = true;
-
-				const messageClass = 'my_message';
-
-				chatBox.innerHTML += `
-												<div class="message ${messageClass}">
-													<p>${newMessage} <br> <span>${currentTime}</span></p>
-												</div>
-											`;
-
-				const recipientUserId = senderNameElement.getAttribute('data-user');
-
-				try {
-					const response = await fetch("/Main/SendMessage", {
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-							"RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
-						},
-						body: JSON.stringify({
-							To: recipientUserId,
-							Message: newMessage
-						})
-					});
-
-					const data = await response.json();
-
-					if (data.success) {
-						chatInput.value = '';
-					} else {
-						console.error("Mesaj gönderilirken bir hata oluştu.");
-					}
-				} catch (error) {
-					console.error("Mesaj gönderilirken bir hata oluştu.", error);
-				} finally {
-					isSendingMessage = false;
-				}
-			}
-		}
-
-		async function selectUser(userId) {
-			selectedUserId = userId;
-			console.log("Selected User ID:", userId);
-
-			// Kullanıcıyı seçildi olarak işaretleyebilirsiniz
-			const blocks = document.querySelectorAll('.block');
-			blocks.forEach((block) => {
-				block.classList.remove('selected');
-				if (block.getAttribute('data-user') === userId) {
-					block.classList.add('selected');
-				}
-			});
-
-			// Seçilen kullanıcının id'sini senderName elementine ata
-			const selectedUserBlock = document.querySelector(`[data-user="${userId}"]`);
-			senderNameElement.textContent = selectedUserBlock.querySelector('.listHead h4').textContent;
-			senderNameElement.setAttribute('data-user', userId);
-
-			selectedUserBlock.classList.add('selected');
-		}
-
-		function toggleUserListModal() {
-			const modal = document.getElementById("userListModal");
-			if (isUserListModalOpen) {
-				modal.style.display = "none";
-			} else {
-				modal.style.display = "block";
-			}
-			isUserListModalOpen = !isUserListModalOpen;
-		}
-
-		function toggleChatList() {
-			const chatList = document.getElementById('chatList');
-			if (isChatListOpen) {
-				chatList.style.display = 'none';
-			} else {
-				chatList.style.display = 'block';
-			}
-			isChatListOpen = !isChatListOpen;
-		}
-
-		document.addEventListener("DOMContentLoaded", async () => {
-			const chatBox = document.querySelector('.chatBox');
-			chatBox.innerHTML = '';
-
-			const messageButton = document.getElementById('messageButton');
-			messageButton.addEventListener('click', () => {
-				toggleUserListModal();
-				toggleChatList();
-			});
-		});
-	</script>
-	<script>
-		// Ayarlar iconuna tıklama işlemi
-		const settingsIcon = document.getElementById('settingsIcon');
-		const settingsWindow = document.getElementById('settingsWindow');
-
-		const ppButton = document.getElementById('pp');
-		const ppModal = document.getElementById('ppModal');
-		const ppForm = document.getElementById('ppForm');
-		const overlay = document.querySelector('.overlay');
-
-		ppButton.addEventListener('click', () => {
-			// Pencereyi göster
-			ppModal.style.display = 'block';
-			// Overlay'i aktif hale getir
-			overlay.classList.add('active');
-		});
-
-		// Pencereyi kapatma işlemi için bir düğme veya tıklama olayı ekleyebilirsiniz
-		const closeButton = document.getElementById('closeButton');
-		closeButton.addEventListener('click', () => {
-			// Pencereyi gizle
-			ppModal.style.display = 'none';
-			// Overlay'i devre dışı bırak
-			overlay.classList.remove('active');
-		});
-		settingsIcon.addEventListener('click', () => {
-			// Ayarlar penceresini göster veya gizle
-			if (settingsWindow.style.display === 'block') {
-				settingsWindow.style.display = 'none';
-			} else {
-				settingsWindow.style.display = 'block';
-			}
-		});
-
-		document.getElementById('pp').addEventListener('click', function () {
-			document.querySelector('.overlay').style.display = 'block';
-			document.getElementById('ppModal').style.display = 'block';
-		});
-
-		document.querySelector('.overlay').addEventListener('click', function (e) {
-			if (e.target === document.querySelector('.overlay')) {
-				document.querySelector('.overlay').style.display = 'none';
-				document.getElementById('ppModal').style.display = 'none';
-			}
-		});
+        connection.start().catch((err) => {
+            console.error(err.toString());
+        });
 
 
-		document.getElementById('closeModalButton').addEventListener('click', function () {
-			document.querySelector('.overlay').style.display = 'none';
-			document.getElementById('ppModal').style.display = 'none';
-		});
+        messageBlocks.forEach((block) => {
+            block.addEventListener('click', async () => {
+                const senderId = block.getAttribute('data-user');
+                selectUser(senderId);
 
-	</script>
+                try {
+                    const response = await fetch(`/Main/GetAllMessagesWithUser?userId=${senderId}`);
+                    const data = await response.json();
+
+                    if (data.success) {
+                        const chatBox = document.querySelector('.chatBox');
+                        chatBox.innerHTML = '';
+
+                        data.messages.forEach((message) => {
+                            const messageClass = message.from == '@(Model.CurrentUser.Id)' ? 'my_message' : 'frnd_message';
+                            const messageDate = new Date(message.time);
+                            const formattedTime = messageDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+
+                            const messageHTML = `
+                                                                                                <div class="message ${messageClass}">
+                                                                                                    <p>${message.message} <br> <span>${formattedTime}</span></p>
+                                                                                                </div>
+                                                                                            `;
+
+                            chatBox.innerHTML += messageHTML;
+                        });
+
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                    } else {
+                        console.error('Mesajları getirirken bir hata oluştu.');
+                    }
+                } catch (error) {
+                    console.error('Mesajları getirirken bir hata oluştu.', error);
+                }
+            });
+        });
+
+        sendButton.addEventListener('click', function (event) {
+            event.preventDefault();
+
+            if (isSendingMessage) {
+                return;
+            }
+            sendMessage();
+        });
+
+        async function sendMessage() {
+            const newMessage = chatInput.value.trim();
+
+            if (newMessage !== '') {
+                const chatBox = document.querySelector('.chatBox');
+                const currentTime = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+
+                isSendingMessage = true;
+
+                const messageClass = 'my_message';
+
+                chatBox.innerHTML += `
+                                                                                <div class="message ${messageClass}">
+                                                                                    <p>${newMessage} <br> <span>${currentTime}</span></p>
+                                                                                </div>
+                                                                            `;
+
+                const recipientUserId = senderNameElement.getAttribute('data-user');
+
+                try {
+                    const response = await fetch("/Main/SendMessage", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        body: JSON.stringify({
+                            To: recipientUserId,
+                            Message: newMessage
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        chatInput.value = '';
+                    } else {
+                        console.error("Mesaj gönderilirken bir hata oluştu.");
+                    }
+                } catch (error) {
+                    console.error("Mesaj gönderilirken bir hata oluştu.", error);
+                } finally {
+                    isSendingMessage = false;
+                }
+            }
+        }
+
+        async function selectUser(userId) {
+            selectedUserId = userId;
+            console.log("Selected User ID:", userId);
+
+            // Kullanıcıyı seçildi olarak işaretleyebilirsiniz
+            const blocks = document.querySelectorAll('.block');
+            blocks.forEach((block) => {
+                block.classList.remove('selected');
+                if (block.getAttribute('data-user') === userId) {
+                    block.classList.add('selected');
+                }
+            });
+
+            // Seçilen kullanıcının id'sini senderName elementine ata
+            const selectedUserBlock = document.querySelector(`[data-user="${userId}"]`);
+            senderNameElement.textContent = selectedUserBlock.querySelector('.listHead h4').textContent;
+            senderNameElement.setAttribute('data-user', userId);
+
+            // Seçilen kullanıcının profil fotoğrafını getir
+            const userPhotoUrl = selectedUserBlock.getAttribute('data-user-photo-url');
+            const senderPhotoElement = document.getElementById('senderPhoto');
+            senderPhotoElement.src = userPhotoUrl;
+
+            selectedUserBlock.classList.add('selected');
+        }
+
+
+        function toggleUserListModal() {
+            const modal = document.getElementById("userListModal");
+            if (isUserListModalOpen) {
+                modal.style.display = "none";
+            } else {
+                modal.style.display = "block";
+            }
+            isUserListModalOpen = !isUserListModalOpen;
+        }
+
+        function toggleChatList() {
+            const chatList = document.getElementById('chatList');
+            if (isChatListOpen) {
+                chatList.style.display = 'none';
+            } else {
+                chatList.style.display = 'block';
+            }
+            isChatListOpen = !isChatListOpen;
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const chatBox = document.querySelector('.chatBox');
+            chatBox.innerHTML = '';
+
+            const messageButton = document.getElementById('messageButton');
+            messageButton.addEventListener('click', () => {
+                toggleUserListModal();
+                toggleChatList();
+            });
+        });
+    </script>
+    <script>
+        // Ayarlar iconuna tıklama işlemi
+        // Ayarlar iconuna tıklama işlemi
+        const settingsIcon = document.getElementById('settingsIcon');
+        const settingsWindow = document.getElementById('settingsWindow');
+
+        const ppButton = document.getElementById('pp');
+        const ppModal = document.getElementById('ppModal');
+        const ppWrapper = document.querySelector('.profilepic__wrapper');
+
+        // Dosya yükleme formunu dinle
+        const photoUploadForm = document.getElementById('ppModal');
+        const photoInput = document.getElementById('PhotoUrl');
+        const resultMessage = document.getElementById('resultMessage');
+
+        photoUploadForm.addEventListener('change', async (e) => {
+            const formData = new FormData();
+            formData.append('file', photoInput.files[0]);
+
+            try {
+                const response = await fetch('/Main/UploadImage', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        // Başarıyla yüklendiğinde, profil fotoğrafını güncelle
+                        const profileImage = document.querySelector('.profilepic__image');
+                        profileImage.src = data.photoUrl;
+                        resultMessage.textContent = 'Profil fotoğrafı güncellendi.';
+                    } else {
+                        resultMessage.textContent = 'Fotoğraf yüklenirken bir hata oluştu.';
+                    }
+                }
+            } catch (error) {
+                console.error('Fotoğraf yükleme sırasında bir hata oluştu:', error);
+                resultMessage.textContent = 'Fotoğraf yüklenirken bir hata oluştu.';
+            }
+        });
+
+        ppButton.addEventListener('click', (event) => {
+            // Pencereyi göster
+            ppModal.style.display = 'block';
+            event.stopPropagation(); // Tıklamayı iletmeyi durdur
+        });
+
+        settingsIcon.addEventListener('click', () => {
+            // Ayarlar penceresini göster veya gizle
+            if (settingsWindow.style.display === 'block') {
+                settingsWindow.style.display = 'none';
+            } else {
+                settingsWindow.style.display = 'block';
+            }
+        });
+
+        document.getElementById('pp').addEventListener('click', function () {
+            document.getElementById('ppModal').style.display = 'block';
+        });
+
+        // ppModal dışında bir yere tıkladığınızda ppModal'i kapat
+        document.addEventListener('click', (event) => {
+            if (event.target !== ppButton && event.target !== ppWrapper) {
+                ppModal.style.display = 'none';
+            }
+        });
+
+        // Tıklamayı etkileşime izin vermek için ppModal içindeki tıklamaları durdur
+        ppModal.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+
+    </script>
 </body>
 </html>
