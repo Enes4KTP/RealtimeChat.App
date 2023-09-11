@@ -19,7 +19,9 @@ namespace RealtimeChat.MVC.Dtos.RegisterDto
         [Required(ErrorMessage = "Şifre girilmesi zorunludur.")]
         public string? Password { get; set; }
 
-        [Required(ErrorMessage = "Şifre girilmesi zorunludur.")]
+		public string? PhotoUrl { get; set; }
+
+		[Required(ErrorMessage = "Şifre girilmesi zorunludur.")]
         [Compare("Password",ErrorMessage ="Şifreler uyuşmuyor.")]
         public string? ConfirmPassword { get; set; }
     }

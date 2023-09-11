@@ -67,5 +67,18 @@ namespace RtChat.BusinessLayer.Services
 			return messages;
 		}
 
+		public async Task MarkMessagesAsRead(string recipientUserId)
+		{
+			var filter = Builders<Messages>.Filter.And(
+				Builders<Messages>.Filter.Eq(x => x.From, recipientUserId),
+				Builders<Messages>.Filter.Eq(x => x.IsRead, false) 
+			);
+
+			var update = Builders<Messages>.Update.Set(x => x.IsRead, true);
+
+			await _messageCollection.UpdateManyAsync(filter, update);
+		}
+
+
 	}
 }
