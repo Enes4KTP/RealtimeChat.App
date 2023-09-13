@@ -320,6 +320,30 @@
 			}
 		}
 
+		// Alıcı özel anahtarı (Base64 kodlu) bu değişken içinde saklanmalıdır
+		const recipientPrivateKeyBase64 = '@Model.RecipientPrivateKeyBase64';
+
+		// Şifreli mesajı çözmek için bir fonksiyon ekleyin
+		function decryptMessage(encryptedMessage, privateKeyBase64) {
+			try {
+				// Şifreli mesajı Base64'ten çöz
+				const encryptedBytes = atob(encryptedMessage);
+				const privateKeyBytes = atob(privateKeyBase64);
+
+				// Alıcı özel anahtarını kullanarak mesajı çöz
+				const privateKey = new Uint8Array(privateKeyBytes.length);
+				for (let i = 0; i < privateKeyBytes.length; ++i) {
+					privateKey[i] = privateKeyBytes.charCodeAt(i);
+				}
+
+				const decryptedMessage = decryptAES(encryptedBytes, privateKey);
+				return decryptedMessage;
+			} catch (error) {
+				console.error('Mesaj çözme hatası:', error);
+				return 'Mesajı çözme başarısız oldu.';
+			}
+		}
+
 		async function selectUser(userId) {
 			selectedUserId = userId;
 			console.log("Selected User ID:", userId);

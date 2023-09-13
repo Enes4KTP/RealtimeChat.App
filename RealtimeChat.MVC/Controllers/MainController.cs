@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Plugins;
 using System.Net.Http.Headers;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace RealtimeChat.MVC.Controllers
 {
@@ -24,8 +26,6 @@ namespace RealtimeChat.MVC.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IHubContext<ChatHub> _hubContext;
         private readonly IWebHostEnvironment webHostEnvironment;
-
-        public MediaTypeHeaderValue? MediaTypeHeader { get; private set; }
 
         public MainController(MessageServices messageServices, UserManager<User> userManager, IHubContext<ChatHub> hubContext, IWebHostEnvironment webHostEnvironment)
         {
@@ -70,44 +70,62 @@ namespace RealtimeChat.MVC.Controllers
             return View(model);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> SendMessage([FromBody] Messages model)
-        {
-            User? currentUser = await _userManager.GetUserAsync(User);
-            User? recipientUser = await _userManager.FindByIdAsync(model.To);
+		[HttpPost]
+		public async Task<IActionResult> SendMessage([FromBody] Messages model)
+		{
+			User? currentUser = await _userManager.GetUserAsync(User);
+			User? recipientUser = await _userManager.FindByIdAsync(model.To);
 
-            Messages message = new Messages
-            {
-                From = currentUser.Id.ToString(),
-                To = recipientUser.Id.ToString(),
-                Message = model.Message,
-                Time = DateTime.UtcNow,
-                IsRead = false,
-                User = currentUser
-            };
+			try
+			{
+				RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(2048);
 
-            try
-            {
-                await _messageServices.CreateAsync(message);
+				byte[] encryptedMessage;
 
-                await _hubContext.Clients.User(recipientUser.Id.ToString()).SendAsync("receiveMessage", new
-                {
-                    message = message.Message,
-                    time = message.Time.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
-                    isMine = false
-                });
+				encryptedMessage = rsa.Encrypt(Encoding.UTF8.GetBytes(model.Message), RSAEncryptionPadding.Pkcs1);
 
-                return Json(new { success = true });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Hata Mesajı: " + ex.Message);
-                Console.WriteLine("Hata Türü: " + ex.GetType().FullName);
-                return Json(new { success = false, error = ex.Message });
-            }
-        }
+				Messages message = new Messages
+				{
+					From = currentUser.Id.ToString(),
+					To = recipientUser.Id.ToString(),
+					Message = encryptedMessage.ToString(),
+					Time = DateTime.UtcNow,
+					IsRead = false,
+					User = currentUser
+				};
 
-        public async Task<IActionResult> GetAllMessagesWithUser(string userId)
+				await _messageServices.CreateAsync(message);
+
+				await _hubContext.Clients.User(recipientUser.Id.ToString()).SendAsync("receiveMessage", new
+				{
+					message = message.Message,
+					time = message.Time.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+					isMine = false
+				});
+
+				string decryptedMessage = decryptMessage(encryptedMessage);
+
+				return Json(new { success = true, decryptedMessage = decryptedMessage });
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("Hata Mesajı: " + ex.Message);
+				Console.WriteLine("Hata Türü: " + ex.GetType().FullName);
+				return Json(new { success = false, error = ex.Message });
+			}
+		}
+
+		private string decryptMessage(byte[] encryptedMessage)
+		{
+			RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(2048);
+			byte[] decryptedMessage = rsa.Decrypt(encryptedMessage, RSAEncryptionPadding.Pkcs1);
+
+			string decryptedMessageString = Encoding.UTF8.GetString(decryptedMessage);
+
+			return decryptedMessageString;
+		}
+
+		public async Task<IActionResult> GetAllMessagesWithUser(string userId)
         {
             var currentUser = await _userManager.GetUserAsync(User);
 

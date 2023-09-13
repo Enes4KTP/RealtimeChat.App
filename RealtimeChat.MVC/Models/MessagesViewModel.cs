@@ -8,5 +8,7 @@ namespace RealtimeChat.MVC.Models
         public HashSet<string> DisplayedUsers { get; set; } = new HashSet<string>();
         public List<User>? Users { get; set; }
         public User? CurrentUser { get; set; }
-    }
+        public string? RecipientPrivateKeyBase64 { get; set; }
+
+	}
 }
