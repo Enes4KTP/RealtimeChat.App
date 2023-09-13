@@ -186,20 +186,21 @@
 
 			const isMyMessage = message.from == '@(Model.CurrentUser.Id)';
 
+			if (!isMyMessage) {
 				const messageDate = new Date(message.time);
 				const formattedTime = messageDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
 
+				const decryptedMessage = decryptMessage(message.message, recipientPrivateKeyBase64);
+
 				const messageHTML = `
-				<div class="message frnd_message">
-				<p>${message.message} <br> <span>${formattedTime}</span></p>
-				</div>
-				`;
+								<div class="message frnd_message">
+									<p>${decryptedMessage} <br> <span>${formattedTime}</span></p>
+								</div>
+							`;
 
 				chatBox.innerHTML += messageHTML;
 				chatBox.scrollTop = chatBox.scrollHeight;
-		});
-
-		connection.on("MessageMarkedAsRead", (messageId) => {
+			}
 		});
 
 		connection.start().catch((err) => {
@@ -225,36 +226,17 @@
 							const messageDate = new Date(message.time);
 							const formattedTime = messageDate.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
 
-							let messageHTML = ''; // Boş bir string ile başlayın
-
-							if (messageClass == "my_message") {
-								if (message.isRead) {
-									messageHTML = `
-										<div class="message ${messageClass}">
-											<p>${message.message} <br> <span>${formattedTime}</span> 
-											<i class="fa-solid fa-check-double" style="color: #0fb8b5;"></i> </p>
-										</div>`;
-								} else {
-									messageHTML = `
-										<div class="message ${messageClass}">
-											<p>${message.message} <br> <span>${formattedTime}</span> 
-											<i class="fa-solid fa-check-double" style="color: #9d9f9f;"></i> </p>
-										</div>`;
-								}
-							}
-							else if (messageClass == "frnd_message") {
-								messageHTML = `
-										<div class="message ${messageClass}">
-										<p>${message.message} <br> <span>${formattedTime}</span></p>
-										</div>`;
-							}
+							const messageHTML = `
+																										<div class="message ${messageClass}">
+																											<p>${message.message} <br> <span>${formattedTime}</span></p>
+																										</div>
+																									`;
 
 							chatBox.innerHTML += messageHTML;
 						});
 
 						chatBox.scrollTop = chatBox.scrollHeight;
-					}
-					else {
+					} else {
 						console.error('Mesajları getirirken bir hata oluştu.');
 					}
 				} catch (error) {
@@ -284,11 +266,10 @@
 				const messageClass = 'my_message';
 
 				chatBox.innerHTML += `
-				<div class="message ${messageClass}">
-				<p>${newMessage} <br> <span>${currentTime}</span> 
-				<i class="fa-solid fa-check-double" style="color: #9d9f9f;"></i> </p>
-				</div>
-				`;
+																						<div class="message ${messageClass}">
+																							<p>${newMessage} <br> <span>${currentTime}</span></p>
+																						</div>
+																					`;
 
 				const recipientUserId = senderNameElement.getAttribute('data-user');
 
@@ -320,10 +301,45 @@
 			}
 		}
 
+		// Alıcı özel anahtarı (Base64 kodlu) bu değişken içinde saklanmalıdır
+		const recipientPrivateKeyBase64 = '@Model.RecipientPrivateKeyBase64';
+
+		// Şifreli mesajı çözmek için bir fonksiyon ekleyin
+		function decryptMessage(encryptedMessage, privateKeyBase64) {
+			try {
+				// Şifreli mesajı Base64'ten çöz
+				const encryptedBytes = atob(encryptedMessage);
+				const privateKeyBytes = atob(privateKeyBase64);
+
+				// Alıcı özel anahtarını kullanarak mesajı çöz
+				const privateKey = new Uint8Array(privateKeyBytes.length);
+				for (let i = 0; i < privateKeyBytes.length; ++i) {
+					privateKey[i] = privateKeyBytes.charCodeAt(i);
+				}
+
+				const decryptedMessage = decryptAES(encryptedBytes, privateKey);
+				return decryptedMessage;
+			} catch (error) {
+				console.error('Mesaj çözme hatası:', error);
+				return 'Mesajı çözme başarısız oldu.';
+			}
+		}
+
+		// AES şifrelemeyi kullanarak şifreli mesajı çözmek için bir fonksiyon ekleyin
+		function decryptAES(encryptedBytes, privateKey) {
+			// Burada şifreleme ve çözme işlemleri gerçekleştirilmelidir.
+			// Örnek olarak, Bouncy Castle veya Web Crypto API gibi bir kütüphane kullanabilirsiniz.
+
+			// Şifreleme ve çözme işlemleri için uygun kütüphane veya fonksiyonları kullanmalısınız.
+			// Şifreleme algoritma ve anahtar yönetimi işlemleri karmaşıklığı artırabilir,
+			// bu nedenle gereksinimlerinize uygun bir çözüm seçmelisiniz.
+		}
+
 		async function selectUser(userId) {
 			selectedUserId = userId;
 			console.log("Selected User ID:", userId);
 
+			// Kullanıcıyı seçildi olarak işaretleyebilirsiniz
 			const blocks = document.querySelectorAll('.block');
 			blocks.forEach((block) => {
 				block.classList.remove('selected');
@@ -331,22 +347,6 @@
 					block.classList.add('selected');
 				}
 			});
-
-			try {
-				const response = await fetch(`/Main/MarkMessagesAsRead?userId=${userId}`, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
-					}
-				});
-
-				const data = await response.json();
-
-				} catch (error) {
-					console.error('Mesajları işaretlerken bir hata oluştu.', error);
-				}
-		
 
 			// Seçilen kullanıcının id'sini senderName elementine ata
 			const selectedUserBlock = document.querySelector(`[data-user="${userId}"]`);
@@ -357,10 +357,6 @@
 			const userPhotoUrl = selectedUserBlock.getAttribute('data-user-photo-url');
 			const senderPhotoElement = document.getElementById('senderPhoto');
 			senderPhotoElement.src = userPhotoUrl;
-
-			const userLastSeen = selectedUserBlock.getAttribute('data-user-lastseen');
-			const lastSeenElement = document.getElementById('lastSeen');
-			lastSeenElement.textContent = userLastSeen;
 
 			selectedUserBlock.classList.add('selected');
 		}

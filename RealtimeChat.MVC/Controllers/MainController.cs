@@ -14,6 +14,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Plugins;
 using System.Net.Http.Headers;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Security;
+using System.Text;
 
 namespace RealtimeChat.MVC.Controllers
 {
@@ -70,44 +74,96 @@ namespace RealtimeChat.MVC.Controllers
             return View(model);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> SendMessage([FromBody] Messages model)
-        {
-            User? currentUser = await _userManager.GetUserAsync(User);
-            User? recipientUser = await _userManager.FindByIdAsync(model.To);
+		[HttpPost]
+		public async Task<IActionResult> SendMessage([FromBody] Messages model)
+		{
+			User? currentUser = await _userManager.GetUserAsync(User);
+			User? recipientUser = await _userManager.FindByIdAsync(model.To);
 
-            Messages message = new Messages
-            {
-                From = currentUser.Id.ToString(),
-                To = recipientUser.Id.ToString(),
-                Message = model.Message,
-                Time = DateTime.UtcNow,
-                IsRead = false,
-                User = currentUser
-            };
+			try
+			{
+				var keyGenerationParameters = new KeyGenerationParameters(new SecureRandom(), 256);
+				var keyGenerator = GeneratorUtilities.GetKeyPairGenerator("ECDSA");
+				keyGenerator.Init(keyGenerationParameters);
+				var keyPair = keyGenerator.GenerateKeyPair();
+				var privateKeyParameters = (ECPrivateKeyParameters)keyPair.Private;
 
-            try
-            {
-                await _messageServices.CreateAsync(message);
+				// Şifreleme motorunu başlatın (AES kullanacağız)
+				var cipher = CipherUtilities.GetCipher("AES/ECB/PKCS7Padding");
 
-                await _hubContext.Clients.User(recipientUser.Id.ToString()).SendAsync("receiveMessage", new
-                {
-                    message = message.Message,
-                    time = message.Time.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
-                    isMine = false
-                });
+				// Şifreleme anahtarını ayarlayın
+				var key = new KeyParameter(privateKeyParameters.D.ToByteArrayUnsigned());
 
-                return Json(new { success = true });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Hata Mesajı: " + ex.Message);
-                Console.WriteLine("Hata Türü: " + ex.GetType().FullName);
-                return Json(new { success = false, error = ex.Message });
-            }
-        }
+				// Mesajı şifrele
+				cipher.Init(true, key);
+				var inputBytes = Encoding.UTF8.GetBytes(model.Message);
+				var encryptedBytes = cipher.DoFinal(inputBytes);
 
-        public async Task<IActionResult> GetAllMessagesWithUser(string userId)
+				// Şifrelenmiş mesajı Base64 ile kodlayın (kodlama işlemi tercihinize bağlıdır)
+				var encryptedMessage = Convert.ToBase64String(encryptedBytes);
+
+				Messages message = new Messages
+				{
+					From = currentUser.Id.ToString(),
+					To = recipientUser.Id.ToString(),
+					Message = encryptedMessage,
+					Time = DateTime.UtcNow,
+					IsRead = false,
+					User = currentUser
+				};
+
+				await _messageServices.CreateAsync(message);
+
+				await _hubContext.Clients.User(recipientUser.Id.ToString()).SendAsync("receiveMessage", new
+				{
+					message = message.Message,
+					time = message.Time.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ"),
+					isMine = false
+				});
+
+				return Json(new { success = true });
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("Hata Mesajı: " + ex.Message);
+				Console.WriteLine("Hata Türü: " + ex.GetType().FullName);
+				return Json(new { success = false, error = ex.Message });
+			}
+		}
+
+		public string DecryptMessage(string encryptedMessage, MessagesViewModel viewModel)
+		{
+			try
+			{
+				// Şifreleme motorunu başlatın (AES kullanılıyor)
+				var cipher = CipherUtilities.GetCipher("AES/ECB/PKCS7Padding");
+
+				// Şifreleme anahtarını ayarlayın (alıcının özel anahtarı)
+				var privateKeyBytes = Convert.FromBase64String(viewModel.RecipientPrivateKeyBase64);
+				var key = new KeyParameter(privateKeyBytes);
+
+				// Şifreli mesajı Base64 ile kodlamadan önce byte dizisine dönüştürün
+				var encryptedBytes = Convert.FromBase64String(encryptedMessage);
+
+				// Şifreleme motorunu başlatın ve çözme işlemini gerçekleştirin
+				cipher.Init(false, key);
+				var decryptedBytes = cipher.DoFinal(encryptedBytes);
+
+				// Çözülen metni UTF-8 kodlamasına göre çözün
+				var decryptedMessage = Encoding.UTF8.GetString(decryptedBytes);
+
+				return decryptedMessage;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("Hata Mesajı: " + ex.Message);
+				Console.WriteLine("Hata Türü: " + ex.GetType().FullName);
+				return null;
+			}
+		}
+
+
+		public async Task<IActionResult> GetAllMessagesWithUser(string userId)
         {
             var currentUser = await _userManager.GetUserAsync(User);
 
