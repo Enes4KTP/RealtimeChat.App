@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using RealtimeChat.MVC.Dtos.RegisterDto;
+using RtChat.DataAccessLayer.Migrations;
 using RtChat.EntityLayer.Concrete;
 
 namespace RealtimeChat.MVC.Controllers
@@ -30,12 +31,13 @@ namespace RealtimeChat.MVC.Controllers
                 Name = createNewUserDto.Name,
                 Surname = createNewUserDto.Surname,
                 Email = createNewUserDto.Mail,
-                UserName = createNewUserDto.Username
-            };
+                UserName = createNewUserDto.Username,
+				PhotoUrl = "/img/user.jpg"
+			};
             var result = await _userManager.CreateAsync(appUser, createNewUserDto.Password);
             if (result.Succeeded)
             {
-                return RedirectToAction("Index","Login");
+                return RedirectToAction("Login","Account");
             }
             return View();
         }

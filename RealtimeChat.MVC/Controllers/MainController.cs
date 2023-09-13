@@ -38,10 +38,13 @@ namespace RealtimeChat.MVC.Controllers
         public async Task<IActionResult> Index(string userId)
         {
             User? currentUser = await _userManager.GetUserAsync(User);
-            List<Messages> receivedMessages = await _messageServices.GetMessagesByRecipientAsync(currentUser.Id.ToString());
-            List<Messages> currentUserMessages = await _messageServices.GetMessagesForUserAsync(currentUser.Id.ToString(), userId);
 
-            var displayedUsers = new HashSet<string>(receivedMessages.Select(message => message.From).Distinct());
+			currentUser.lastSeen = DateTime.Now;
+			await _userManager.UpdateAsync(currentUser);
+
+			var receivedMessages = await _messageServices.GetMessagesByRecipientAsync(currentUser.Id.ToString());
+
+			var displayedUsers = new HashSet<string>(receivedMessages.Select(message => message.From).Distinct());
             displayedUsers.UnionWith(receivedMessages.Select(message => message.To));
 
             var users = await _userManager.Users.Select(user => new User
@@ -50,7 +53,8 @@ namespace RealtimeChat.MVC.Controllers
                 UserName = user.UserName,
                 Name = user.Name,
                 Surname = user.Surname,
-                PhotoUrl = user.PhotoUrl
+                PhotoUrl = user.PhotoUrl,
+                lastSeen = user.lastSeen
 
             }).ToListAsync();
 
@@ -120,6 +124,17 @@ namespace RealtimeChat.MVC.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> MarkMessagesAsRead(string userId)
+        {
+			// Kullanıcının mesajlarını işaretle
+			await _messageServices.MarkMessagesAsRead(userId);
+
+			await _hubContext.Clients.All.SendAsync("MessageMarkedAsRead", userId);
+
+			return Json(new { success = true });
+		}
+
+		[HttpPost]
         public async Task<IActionResult> UploadImage(IFormFile file)
         {
             if (file == null || file.Length <= 0)
@@ -157,39 +172,5 @@ namespace RealtimeChat.MVC.Controllers
                 return Json(new { success = false, error = ex.Message });
             }
         }
-
-
-        //[HttpPost]
-        //public async Task<IActionResult> UploadImage(IFormFile file)
-        //{
-        //    try
-        //    {
-        //        var stream = new MemoryStream();
-        //        await file.CopyToAsync(stream);
-        //        var bytes = stream.ToArray();
-
-        //        ByteArrayContent byteArrayContent = new ByteArrayContent(bytes);
-        //        byteArrayContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
-        //        MultipartFormDataContent multipartFormDataContent = new MultipartFormDataContent();
-        //        multipartFormDataContent.Add(byteArrayContent, "file", file.FileName);
-        //        var httpclient = new HttpClient();
-        //        var responseMessage = await httpclient.PostAsync("http://localhost:5216/api/Images", multipartFormDataContent);
-
-        //        if (responseMessage.IsSuccessStatusCode)
-        //        {
-        //            return Json(new { success = true, message = "Dosya başarıyla yüklendi" });
-        //        }
-        //        else
-        //        {
-        //            return Json(new { success = false, message = "Dosya yükleme başarısız oldu" });
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Hata oluştuğunda hata mesajını döndürmek için isteğe bağlı olarak bir hata işleme mekanizması ekleyebilirsiniz.
-        //        return Json(new { success = false, message = "Bir hata oluştu: " + ex.Message });
-        //    }
-        //}
-
     }
 }
