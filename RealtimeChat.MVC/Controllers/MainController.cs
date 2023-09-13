@@ -144,14 +144,12 @@ namespace RealtimeChat.MVC.Controllers
 
             try
             {
-                // Dosyayı sunucuya kaydetmek için özel bir yol belirleyin.
                 var uploadPath = Path.Combine(webHostEnvironment.WebRootPath, "img");
                 if (!Directory.Exists(uploadPath))
                 {
                     Directory.CreateDirectory(uploadPath);
                 }
 
-                // Dosyanın benzersiz bir adı olsun
                 var uniqueFileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
                 var filePath = Path.Combine(uploadPath, uniqueFileName);
 
@@ -160,7 +158,6 @@ namespace RealtimeChat.MVC.Controllers
                     await file.CopyToAsync(stream);
                 }
 
-                // Dosyanın yolu, PhotoUrl'e kaydedilecek.
                 var currentUser = await _userManager.GetUserAsync(User);
                 currentUser.PhotoUrl = "/img/" + uniqueFileName;
                 await _userManager.UpdateAsync(currentUser);

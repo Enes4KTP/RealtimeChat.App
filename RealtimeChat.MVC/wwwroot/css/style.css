@@ -346,7 +346,7 @@ body {
 }
 
     .chatInput div {
-        width: 90%;
+        width:90%;
     }
 
         .chatInput div input {
@@ -466,3 +466,12 @@ body {
     text-align: center;
 }
 
+#emojiPicker {
+    position: absolute;
+    top: 915px;
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    display: none;
+    z-index: 100; /* İstediğiniz düzeyi ayarlayabilirsiniz */
+}

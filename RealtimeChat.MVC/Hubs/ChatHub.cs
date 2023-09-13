@@ -20,10 +20,8 @@ namespace RealtimeChat.MVC.Hubs
 
 		public async Task MarkMessageAsRead(string messageId)
 		{
-			// messageId ile ilgili mesajı işaretle
 			await _messageServices.MarkMessagesAsRead(messageId);
 
-			// İlgili kullanıcıya mesajın işaretlendiğini bildirin
 			await Clients.User(Context.User.Identity.Name).SendAsync("MessageMarkedAsRead", messageId);
 		}
 
